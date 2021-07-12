@@ -1,12 +1,12 @@
 package com.github.supermoonie.jbrwoserspider.ui;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import org.cef.OS;
 import org.cef.browser.CefBrowser;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -15,61 +15,59 @@ import java.awt.event.MouseEvent;
  * @since 2021/6/15
  */
 public class ControlPanel extends JPanel {
+
+    private static final Icon LEFT_ICON = new FlatSVGIcon("icons/left.svg", 16, 16);
+    private static final Icon RIGHT_ICON = new FlatSVGIcon("icons/right.svg", 16, 16);
+    private static final Icon REFRESH_ICON = new FlatSVGIcon("icons/refresh.svg", 16, 16);
+    private static final Icon CLOSE_ICON = new FlatSVGIcon("icons/close.svg", 16, 16);
+
     private final JButton backButton;
     private final JButton forwardButton;
     private final JButton reloadButton;
     private final JTextField addressField;
-    private final JLabel zoomLabel;
-    private double zoomLevel = 0;
-    private CefBrowser browser;
+    private final CefBrowser cefBrowser;
 
-    public ControlPanel() {
+    public ControlPanel(CefBrowser cefBrowser) {
+        this.cefBrowser = cefBrowser;
         setEnabled(true);
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(Box.createHorizontalStrut(5));
         add(Box.createHorizontalStrut(5));
 
-        backButton = new JButton("Back");
+        backButton = new JButton(LEFT_ICON);
         backButton.setAlignmentX(LEFT_ALIGNMENT);
-        backButton.addActionListener(e -> browser.goBack());
+        backButton.addActionListener(e -> cefBrowser.goBack());
         add(backButton);
         add(Box.createHorizontalStrut(5));
 
-        forwardButton = new JButton("Forward");
+        forwardButton = new JButton(RIGHT_ICON);
         forwardButton.setAlignmentX(LEFT_ALIGNMENT);
-        forwardButton.addActionListener(e -> browser.goForward());
+        forwardButton.addActionListener(e -> cefBrowser.goForward());
         add(forwardButton);
         add(Box.createHorizontalStrut(5));
 
-        reloadButton = new JButton("Reload");
+        reloadButton = new JButton(REFRESH_ICON);
         reloadButton.setAlignmentX(LEFT_ALIGNMENT);
         reloadButton.addActionListener(e -> {
-            if (reloadButton.getText().equalsIgnoreCase("reload")) {
+            if (reloadButton.getIcon().equals(REFRESH_ICON)) {
                 int mask = OS.isMacintosh()
                         ? ActionEvent.META_MASK
                         : ActionEvent.CTRL_MASK;
                 if ((e.getModifiers() & mask) != 0) {
-                    System.out.println("Reloading - ignoring cached values");
-                    browser.reloadIgnoreCache();
+                    cefBrowser.reloadIgnoreCache();
                 } else {
-                    System.out.println("Reloading - using cached values");
-                    browser.reload();
+                    cefBrowser.reload();
                 }
             } else {
-                browser.stopLoad();
+                cefBrowser.stopLoad();
             }
         });
         add(reloadButton);
         add(Box.createHorizontalStrut(5));
 
-        JLabel addressLabel = new JLabel("Address:");
-        addressLabel.setAlignmentX(LEFT_ALIGNMENT);
-        add(addressLabel);
-        add(Box.createHorizontalStrut(5));
-
         addressField = new JTextField(100);
         addressField.setAlignmentX(LEFT_ALIGNMENT);
-        addressField.addActionListener(e -> browser.loadURL(getAddress()));
+        addressField.addActionListener(e -> cefBrowser.loadURL(getAddress()));
         addressField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
@@ -81,42 +79,14 @@ public class ControlPanel extends JPanel {
         add(addressField);
         add(Box.createHorizontalStrut(5));
 
-        JButton goButton = new JButton("Go");
-        goButton.setAlignmentX(LEFT_ALIGNMENT);
-        goButton.addActionListener(e -> browser.loadURL(getAddress()));
-        add(goButton);
-        add(Box.createHorizontalStrut(5));
-
-        JButton minusButton = new JButton("-");
-        minusButton.setAlignmentX(CENTER_ALIGNMENT);
-        minusButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browser.setZoomLevel(--zoomLevel);
-                zoomLabel.setText(Double.toString(zoomLevel));
-            }
-        });
-        add(minusButton);
-
-        zoomLabel = new JLabel("0.0");
-        zoomLabel.setBorder(BorderFactory.createEmptyBorder(0, 3, 0, 3));
-        add(zoomLabel);
-
-        JButton plusButton = new JButton("+");
-        plusButton.setAlignmentX(CENTER_ALIGNMENT);
-        plusButton.addActionListener(e -> {
-            browser.setZoomLevel(++zoomLevel);
-            zoomLabel.setText(Double.toString(zoomLevel));
-        });
-        add(plusButton);
         setBorder(BorderFactory.createEmptyBorder(5, 2, 5, 2));
     }
 
     public void update(CefBrowser browser, boolean isLoading, boolean canGoBack, boolean canGoForward) {
-        if (browser == this.browser) {
+        if (browser == this.cefBrowser) {
             backButton.setEnabled(canGoBack);
             forwardButton.setEnabled(canGoForward);
-            reloadButton.setText(isLoading ? "Abort" : "Reload");
+            reloadButton.setIcon(isLoading ? CLOSE_ICON : REFRESH_ICON);
         }
     }
 
@@ -127,15 +97,15 @@ public class ControlPanel extends JPanel {
     }
 
     public void setAddress(CefBrowser browser, String address) {
-        if (browser == this.browser)
+        if (browser == this.cefBrowser) {
             addressField.setText(address);
+        }
     }
 
-    public void setBrowser(CefBrowser browser) {
-        this.browser = browser;
-        backButton.setEnabled(browser.canGoBack());
-        forwardButton.setEnabled(browser.canGoForward());
-        reloadButton.setText(browser.isLoading() ? "Abort" : "Reload");
-        addressField.setText(browser.getURL());
+    public void setCefBrowser(CefBrowser cefBrowser) {
+        backButton.setEnabled(cefBrowser.canGoBack());
+        forwardButton.setEnabled(cefBrowser.canGoForward());
+        reloadButton.setIcon(cefBrowser.isLoading() ? CLOSE_ICON : REFRESH_ICON);
+        addressField.setText(cefBrowser.getURL());
     }
 }

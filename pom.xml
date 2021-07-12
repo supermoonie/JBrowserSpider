@@ -134,7 +134,6 @@
             <activation>
                 <os>
                     <family>windows</family>
-                    <arch>x64</arch>
                 </os>
             </activation>
             <dependencies>

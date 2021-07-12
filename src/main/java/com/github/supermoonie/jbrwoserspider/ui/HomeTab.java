@@ -1,10 +1,9 @@
 package com.github.supermoonie.jbrwoserspider.ui;
 
-import com.github.supermoonie.jbrwoserspider.App;
+import com.github.supermoonie.jbrwoserspider.browser.JCefBrowser;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.cef.browser.CefBrowser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,14 +16,14 @@ import java.awt.*;
 public class HomeTab extends JPanel {
 
     @Getter
-    private final CefBrowser homeBrowser;
+    private final JCefBrowser jCefBrowser;
 
     public HomeTab() {
         setEnabled(true);
         setLayout(new BorderLayout());
         log.info("load {}", UrlSettings.HOME);
-        homeBrowser = App.getInstance().getDefaultCefClient().createBrowser(UrlSettings.HOME, false, false);
-        add(homeBrowser.getUIComponent(), BorderLayout.CENTER);
+        jCefBrowser = new JCefBrowser(UrlSettings.HOME, true, false);
+        add(jCefBrowser, BorderLayout.CENTER);
         setVisible(true);
     }
 }

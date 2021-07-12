@@ -16,5 +16,7 @@ public class AppTest
     public void shouldAnswerWithTrue()
     {
         System.out.println(System.getProperty("host"));
+        System.out.println(System.getProperty("os.name"));
+        System.out.println();
     }
 }

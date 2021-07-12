@@ -2,8 +2,10 @@ package com.github.supermoonie.jbrwoserspider;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.github.supermoonie.jbrwoserspider.browser.JCefClient;
 import com.github.supermoonie.jbrwoserspider.handler.AppHandler;
 import com.github.supermoonie.jbrwoserspider.loader.CefLoader;
+import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import com.github.supermoonie.jbrwoserspider.util.Folders;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +38,6 @@ public class App {
     public final ScheduledExecutorService executor;
     @Getter
     private MainFrame mainFrame;
-    @Getter
-    private final CefClient defaultCefClient;
 
     public static void main(String[] args) {
         try {
@@ -59,22 +59,13 @@ public class App {
         UIManager.setLookAndFeel(FlatLightLaf.class.getName());
         // init cef
         CefApp.addAppHandler(new AppHandler(null));
-        File cefPath = Folders.crateTempFolder(".cef");
-        CefSettings settings = new CefSettings();
-        settings.windowless_rendering_enabled = false;
-        settings.cache_path = cefPath.getAbsolutePath();
-        String debugLogPath = cefPath.getAbsolutePath() + File.separator + "debug.log";
-        settings.log_file = debugLogPath;
-        new File(debugLogPath).deleteOnExit();
-        settings.persist_session_cookies = true;
-        settings.user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36";
-        settings.background_color = settings.new ColorType(100, 255, 255, 255);
+        CefSettings settings = cefSettings();
         if (SystemUtils.IS_OS_WINDOWS) {
             CefLoader.installAndLoadCef(settings);
         } else if (SystemUtils.IS_OS_MAC) {
             JCefLoader.installAndLoadCef(settings);
         }
-        defaultCefClient = CefApp.getInstance().createClient();
+        JCefClient.getInstance();
         // init executor
         executor = new ScheduledThreadPoolExecutor(
                 10,
@@ -88,6 +79,7 @@ public class App {
         SwingUtilities.invokeLater(() -> {
             // main frame
             mainFrame = new MainFrame();
+            JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false);
             mainFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
@@ -97,5 +89,19 @@ public class App {
                 }
             });
         });
+    }
+
+    private CefSettings cefSettings() {
+        File cefPath = Folders.crateTempFolder(".cef");
+        CefSettings settings = new CefSettings();
+        settings.windowless_rendering_enabled = false;
+        settings.cache_path = cefPath.getAbsolutePath();
+        String debugLogPath = cefPath.getAbsolutePath() + File.separator + "debug.log";
+        settings.log_file = debugLogPath;
+        new File(debugLogPath).deleteOnExit();
+        settings.persist_session_cookies = true;
+        settings.user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36";
+        settings.background_color = settings.new ColorType(100, 255, 255, 255);
+        return settings;
     }
 }
