@@ -167,7 +167,7 @@ public class CefLoader {
             deleteDir(installDir);
             //Extract new version
             versionDir.mkdirs();
-            String nativeResourceName = "cef-win64.zip";
+            String nativeResourceName = "zip/cef-win64.zip";
             InputStream resource = JCefLoader.class.getResourceAsStream("/" + nativeResourceName);
             if (resource == null) {
                 try {
@@ -183,6 +183,7 @@ public class CefLoader {
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 if (zipEntry.isDirectory() || zipEntry.getName().isEmpty()) continue;
                 File out = new File(versionDir, zipEntry.getName());
+                log.info("out: {}", out.getAbsolutePath());
                 out.getParentFile().mkdirs();
                 out.createNewFile();
                 FileOutputStream fos = new FileOutputStream(out);
