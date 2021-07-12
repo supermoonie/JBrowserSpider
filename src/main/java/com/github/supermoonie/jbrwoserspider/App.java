@@ -32,7 +32,7 @@ public class App {
     @Getter
     public final ScheduledExecutorService executor;
     @Getter
-    private final MainFrame mainFrame;
+    private MainFrame mainFrame;
     @Getter
     private final CefClient defaultCefClient;
 
@@ -65,16 +65,18 @@ public class App {
         settings.background_color = settings.new ColorType(100, 255, 255, 255);
         CefLoader.installAndLoadCef(settings);
         defaultCefClient = CefApp.getInstance().createClient();
-        // main frame
-        mainFrame = new MainFrame();
-        mainFrame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                CefApp.getInstance().dispose();
-                mainFrame.dispose();
-                System.exit(0);
-            }
-        });
         executor = new ScheduledThreadPoolExecutor(5);
+        SwingUtilities.invokeLater(() -> {
+            // main frame
+            mainFrame = new MainFrame();
+            mainFrame.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    CefApp.getInstance().dispose();
+                    mainFrame.dispose();
+                    System.exit(0);
+                }
+            });
+        });
     }
 }
