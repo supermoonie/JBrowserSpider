@@ -7,10 +7,13 @@ import com.github.supermoonie.jbrwoserspider.loader.CefLoader;
 import com.github.supermoonie.jbrwoserspider.util.Folders;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.cef.CefApp;
 import org.cef.CefClient;
 import org.cef.CefSettings;
+import org.cef.JCefLoader;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -48,6 +51,9 @@ public class App {
         Security.addProvider(new BouncyCastleProvider());
         JFrame.setDefaultLookAndFeelDecorated(true);
         JDialog.setDefaultLookAndFeelDecorated(true);
+        if (SystemUtils.IS_OS_MAC) {
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
         FlatLightLaf.setup();
         FlatDarkLaf.setup();
         UIManager.setLookAndFeel(FlatLightLaf.class.getName());
@@ -63,9 +69,22 @@ public class App {
         settings.persist_session_cookies = true;
         settings.user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36";
         settings.background_color = settings.new ColorType(100, 255, 255, 255);
-        CefLoader.installAndLoadCef(settings);
+        if (SystemUtils.IS_OS_WINDOWS) {
+            CefLoader.installAndLoadCef(settings);
+        } else if (SystemUtils.IS_OS_MAC) {
+            JCefLoader.installAndLoadCef(settings);
+        }
         defaultCefClient = CefApp.getInstance().createClient();
-        executor = new ScheduledThreadPoolExecutor(5);
+        // init executor
+        executor = new ScheduledThreadPoolExecutor(
+                10,
+                new BasicThreadFactory.Builder()
+                        .namingPattern("schedule-exec-%d")
+                        .daemon(false)
+                        .uncaughtExceptionHandler((thread, throwable) -> {
+                            String error = String.format("thread: %s, error: %s", thread.toString(), throwable.getMessage());
+                            log.error(error, throwable);
+                        }).build(), (r, executor) -> log.warn("Thread: {} reject by {}", r.toString(), executor.toString()));
         SwingUtilities.invokeLater(() -> {
             // main frame
             mainFrame = new MainFrame();

@@ -13,8 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -47,11 +47,6 @@
         <dependency>
             <groupId>ws.schild</groupId>
             <artifactId>jave-core</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>ws.schild</groupId>
-            <artifactId>jave-nativebin-win64</artifactId>
             <version>3.0.1</version>
         </dependency>
         <dependency>
@@ -111,7 +106,6 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.76</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on -->
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
@@ -120,20 +114,166 @@
     </dependencies>
 
     <profiles>
+        <!--debug-->
         <profile>
             <id>debug</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <properties>
                 <host>http://localhost:3050</host>
             </properties>
         </profile>
+        <!--release-->
         <profile>
             <id>release</id>
             <properties>
                 <host>https://client</host>
             </properties>
+        </profile>
+        <!--win64-->
+        <profile>
+            <id>win64</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                    <arch>x64</arch>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>ws.schild</groupId>
+                    <artifactId>jave-nativebin-win64</artifactId>
+                    <version>3.0.1</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.github.fvarrui</groupId>
+                        <artifactId>javapackager</artifactId>
+                        <version>1.5.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>package</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>com.github.supermoonie.jbrwoserspider.App</mainClass>
+                                    <!-- optional -->
+                                    <name>JBrowserSpider</name>
+                                    <assetsDir>${basedir}/assets</assetsDir>
+                                    <copyDependencies>true</copyDependencies>
+                                    <bundleJre>true</bundleJre>
+                                    <generateInstaller>true</generateInstaller>
+                                    <administratorRequired>false</administratorRequired>
+                                    <platform>auto</platform>
+                                    <vmArgs>
+                                        <arg>-Dhost=${host}</arg>
+                                    </vmArgs>
+                                    <winConfig>
+                                        <generateMsi>false</generateMsi>
+                                        <icoFile>${basedir}/assets/windows/JBrwoserSpider.ico</icoFile>
+                                        <disableDirPage>false</disableDirPage>
+                                        <disableProgramGroupPage>false</disableProgramGroupPage>
+                                        <disableFinishedPage>false</disableFinishedPage>
+                                        <setupLanguages>
+                                            <english>compiler:Default.isl</english>
+                                            <chinese>compiler:Languages\ChineseSimplified.isl</chinese>
+                                        </setupLanguages>
+                                    </winConfig>
+                                    <additionalModules>
+                                        <module>jdk.crypto.ec</module>
+                                    </additionalModules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!--macos-->
+        <profile>
+            <id>macos</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.cef</groupId>
+                    <artifactId>jcef-natives-macosx64</artifactId>
+                    <version>84.3.8+gc8a556f+chromium-84.0.4147.105</version>
+                </dependency>
+                <dependency>
+                    <groupId>ws.schild</groupId>
+                    <artifactId>jave-nativebin-osx64</artifactId>
+                    <version>3.0.1</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>${project.artifactId}-jar-with-dependencies</finalName>
+                                    <transformers>
+                                        <transformer
+                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <manifestEntries>
+                                                <Main-Class>com.github.supermoonie.jbrwoserspider.App</Main-Class>
+                                            </manifestEntries>
+                                        </transformer>
+                                    </transformers>
+                                    <filters>
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>jcef-natives-*.jar</exclude>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.cef</groupId>
+                        <artifactId>jcef-bundle-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <executions>
+                            <execution>
+                                <id>mac</id>
+                                <goals>
+                                    <goal>macosx64</goal>
+                                </goals>
+                                <configuration>
+                                    <exportType>targz</exportType>
+                                    <bundleName>JBrowserSpider.app</bundleName>
+                                    <bundleDisplayName>JBrowserSpider</bundleDisplayName>
+                                    <bundleIdentifier>com.github.supermoonie.jbrwoserspider.App</bundleIdentifier>
+                                    <relocations>
+                                        <relocation>
+                                            ${project.artifactId}-jar-with-dependencies.jar:${project.artifactId}.jar
+                                        </relocation>
+                                    </relocations>
+                                    <mainClass>com.github.supermoonie.jbrwoserspider.App</mainClass>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
@@ -176,48 +316,5 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>io.github.fvarrui</groupId>
-                <artifactId>javapackager</artifactId>
-                <version>1.5.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>package</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>com.github.supermoonie.jbrwoserspider.App</mainClass>
-                            <!-- optional -->
-                            <name>JBrowserSpider</name>
-                            <assetsDir>${basedir}/assets</assetsDir>
-                            <copyDependencies>true</copyDependencies>
-                            <bundleJre>true</bundleJre>
-                            <generateInstaller>true</generateInstaller>
-                            <administratorRequired>false</administratorRequired>
-                            <platform>auto</platform>
-                            <vmArgs>
-                                <arg>-Dhost=${host}</arg>
-                            </vmArgs>
-                            <winConfig>
-                                <generateMsi>false</generateMsi>
-                                <icoFile>${basedir}/assets/windows/JBrwoserSpider.ico</icoFile>
-                                <disableDirPage>false</disableDirPage>
-                                <disableProgramGroupPage>false</disableProgramGroupPage>
-                                <disableFinishedPage>false</disableFinishedPage>
-                                <setupLanguages>
-                                    <english>compiler:Default.isl</english>
-                                    <chinese>compiler:Languages\ChineseSimplified.isl</chinese>
-                                </setupLanguages>
-                            </winConfig>
-                            <additionalModules>
-                                <module>jdk.crypto.ec</module>
-                            </additionalModules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 </project>
