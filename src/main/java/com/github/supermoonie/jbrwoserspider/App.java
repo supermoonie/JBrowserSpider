@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.supermoonie.jbrwoserspider.browser.JCefClient;
 import com.github.supermoonie.jbrwoserspider.handler.AppHandler;
+import com.github.supermoonie.jbrwoserspider.listener.GlobalKeyListener;
 import com.github.supermoonie.jbrwoserspider.loader.CefLoader;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import com.github.supermoonie.jbrwoserspider.util.Folders;
@@ -16,6 +17,7 @@ import org.cef.CefApp;
 import org.cef.CefClient;
 import org.cef.CefSettings;
 import org.cef.JCefLoader;
+import org.jnativehook.GlobalScreen;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -41,7 +43,9 @@ public class App {
 
     public static void main(String[] args) {
         try {
+            GlobalScreen.registerNativeHook();
             instance = new App();
+            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -83,7 +87,7 @@ public class App {
             mainFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    CefApp.getInstance().dispose();
+//                    CefApp.getInstance().dispose();
                     mainFrame.dispose();
                     System.exit(0);
                 }

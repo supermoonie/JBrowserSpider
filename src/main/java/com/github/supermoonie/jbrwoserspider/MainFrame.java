@@ -2,6 +2,7 @@ package com.github.supermoonie.jbrwoserspider;
 
 import com.formdev.flatlaf.extras.FlatSVGUtils;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +11,7 @@ import java.awt.*;
  * @author super_w
  * @since 2021/7/11
  */
+@Slf4j
 public class MainFrame extends JFrame {
 
     @Getter

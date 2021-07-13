@@ -2,12 +2,16 @@ package com.github.supermoonie.jbrwoserspider.browser;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.github.supermoonie.jbrwoserspider.App;
+import com.github.supermoonie.jbrwoserspider.handler.BrowserLoadHandler;
 import com.github.supermoonie.jbrwoserspider.handler.CefDisplayHandler;
+import com.github.supermoonie.jbrwoserspider.handler.FocusHandler;
 import com.github.supermoonie.jbrwoserspider.handler.LifeSpanHandler;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.cef.CefApp;
 import org.cef.CefClient;
+import org.cef.browser.CefBrowser;
 
 import javax.swing.*;
 import java.util.List;
@@ -20,6 +24,7 @@ import static com.formdev.flatlaf.FlatClientProperties.*;
  * @author super_w
  * @since 2021/7/12
  */
+@Slf4j
 public class JCefClient {
 
     private static JCefClient INSTANCE;
@@ -32,6 +37,8 @@ public class JCefClient {
         defaultCefClient = CefApp.getInstance().createClient();
         defaultCefClient.addLifeSpanHandler(new LifeSpanHandler());
         defaultCefClient.addDisplayHandler(new CefDisplayHandler());
+        defaultCefClient.addFocusHandler(new FocusHandler());
+        defaultCefClient.addLoadHandler(new BrowserLoadHandler());
     }
 
     public static JCefClient getInstance() {
@@ -71,6 +78,15 @@ public class JCefClient {
         });
         int lastIndex = tabbedPane.getTabCount() - 1;
         tabbedPane.setSelectedIndex(lastIndex);
+    }
+
+    public JCefBrowser getBrowser(CefBrowser cefBrowser) {
+        for (JCefBrowser browser : browserList) {
+            if (browser.getCefBrowser().equals(cefBrowser)) {
+                return browser;
+            }
+        }
+        return null;
     }
 
     public JCefBrowser getCurrentBrowser() {

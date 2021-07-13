@@ -46,6 +46,13 @@ public class CefDisplayHandler extends CefDisplayHandlerAdapter {
 
     @Override
     public void onStatusMessage(CefBrowser browser, String value) {
-//        statusPanel.setStatusText(value);
+        JCefBrowser jCefBrowser = JCefClient.getInstance().getBrowser(browser);
+        if (null == jCefBrowser) {
+            return;
+        }
+        if (null == jCefBrowser.getStatusPanel()) {
+            return;
+        }
+        jCefBrowser.getStatusPanel().setStatusText(value);
     }
 }

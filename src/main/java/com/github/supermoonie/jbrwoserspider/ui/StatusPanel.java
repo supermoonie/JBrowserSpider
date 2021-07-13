@@ -9,7 +9,6 @@ import java.awt.*;
  */
 public class StatusPanel extends JPanel {
 
-    private final JProgressBar progressBar;
     private final JLabel statusField;
 
     public StatusPanel() {
@@ -18,23 +17,12 @@ public class StatusPanel extends JPanel {
         add(Box.createHorizontalStrut(5));
         add(Box.createHorizontalStrut(5));
 
-        progressBar = new JProgressBar();
-        Dimension progressBarSize = progressBar.getMaximumSize();
-        progressBarSize.width = 100;
-        progressBar.setMinimumSize(progressBarSize);
-        progressBar.setMaximumSize(progressBarSize);
-        add(progressBar);
-        add(Box.createHorizontalStrut(5));
-
-        statusField = new JLabel("Info");
+        statusField = new JLabel("");
         statusField.setAlignmentX(LEFT_ALIGNMENT);
         add(statusField);
         add(Box.createHorizontalStrut(5));
         add(Box.createVerticalStrut(21));
-    }
-
-    public void setIsInProgress(boolean inProgress) {
-        progressBar.setIndeterminate(inProgress);
+        setBackground(Color.WHITE);
     }
 
     public void setStatusText(String text) {

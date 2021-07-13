@@ -13,32 +13,18 @@ import java.awt.event.ComponentEvent;
  */
 public class DevToolsDialog extends JDialog {
 
-    private final CefBrowser devTools;
-
     public DevToolsDialog(Frame owner, String title, CefBrowser cefBrowser) {
         this(owner, title, null, cefBrowser);
     }
 
     public DevToolsDialog(Frame owner, String title, Point inspectAt, CefBrowser cefBrowser) {
         super(owner, title, false);
-        this.devTools = cefBrowser.getDevTools(inspectAt);
+        CefBrowser devTools = cefBrowser.getDevTools(inspectAt);
         setLayout(new BorderLayout());
         setSize(800, 600);
         setLocation(owner.getLocation().x + 20, owner.getLocation().y + 20);
-        Component uiComponent = this.devTools.getUIComponent();
+        Component uiComponent = devTools.getUIComponent();
         add(uiComponent);
-
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                dispose();
-            }
-        });
     }
 
-    @Override
-    public void dispose() {
-        this.devTools.close(true);
-        super.dispose();
-    }
 }
