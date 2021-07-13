@@ -13,8 +13,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>${jdk}</maven.compiler.source>
+        <maven.compiler.target>${jdk}</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -136,6 +136,9 @@
                     <family>windows</family>
                 </os>
             </activation>
+            <properties>
+                <jdk>11</jdk>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>ws.schild</groupId>
@@ -209,6 +212,9 @@
                     <family>mac</family>
                 </os>
             </activation>
+            <properties>
+                <jdk>1.8</jdk>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.cef</groupId>
