@@ -2,7 +2,7 @@ package com.github.supermoonie.jbrwoserspider.setting;
 
 import com.github.supermoonie.jbrwoserspider.util.PropertiesUtil;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,7 +13,7 @@ public interface UrlSettings {
 
     String HOME = PropertiesUtil.getHost() + "/home_index.html";
 
-    List<String> SPIDER_HOSTS = List.of("www.bilibili.com");
-
-    Map<String, String> HOST_HOME_MAP = Map.of("www.bilibili.com", PropertiesUtil.getHost() + "/bilibili_index.html");
+    Map<String, String> HOST_HOME_MAP = new HashMap<String, String>() {{
+        put("www.bilibili.com", PropertiesUtil.getHost() + "/bilibili_index.html");
+    }};
 }

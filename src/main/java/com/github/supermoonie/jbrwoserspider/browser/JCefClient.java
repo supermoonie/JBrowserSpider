@@ -35,6 +35,7 @@ public class JCefClient {
 
     private JCefClient() {
         defaultCefClient = CefApp.getInstance().createClient();
+        log.info("defaultCefClient created");
         defaultCefClient.addLifeSpanHandler(new LifeSpanHandler());
         defaultCefClient.addDisplayHandler(new CefDisplayHandler());
         defaultCefClient.addFocusHandler(new FocusHandler());
@@ -69,6 +70,7 @@ public class JCefClient {
             synchronized (JCefClient.class) {
                 if (null == INSTANCE) {
                     INSTANCE = new JCefClient();
+                    log.info("JCefClient initialed");
                 }
             }
         }

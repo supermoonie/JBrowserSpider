@@ -26,6 +26,8 @@ import java.io.File;
 import java.security.Security;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author super_w
@@ -43,9 +45,12 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            GlobalScreen.registerNativeHook();
+//            GlobalScreen.registerNativeHook();
+//            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+//            logger.setLevel(Level.OFF);
+//            logger.setUseParentHandlers(false);
             instance = new App();
-            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
+//            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
@@ -62,13 +67,16 @@ public class App {
         FlatLightLaf.setup();
         FlatDarkLaf.setup();
         UIManager.setLookAndFeel(FlatLightLaf.class.getName());
+        log.info("look and feel set");
         // init cef
         CefApp.addAppHandler(new AppHandler(null));
         CefSettings settings = cefSettings();
         if (SystemUtils.IS_OS_WINDOWS) {
             CefLoader.installAndLoadCef(settings);
+            log.info("windows cef install");
         } else if (SystemUtils.IS_OS_MAC) {
             JCefLoader.installAndLoadCef(settings);
+            log.info("macos cef install");
         }
         // init executor
         executor = new ScheduledThreadPoolExecutor(
@@ -80,10 +88,13 @@ public class App {
                             String error = String.format("thread: %s, error: %s", thread.toString(), throwable.getMessage());
                             log.error(error, throwable);
                         }).build(), (r, executor) -> log.warn("Thread: {} reject by {}", r.toString(), executor.toString()));
+        log.info("executor init");
         SwingUtilities.invokeLater(() -> {
             // main frame
             mainFrame = new MainFrame();
+            log.info("main frame init");
             JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false, null);
+            log.info("CefClient init");
             mainFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {

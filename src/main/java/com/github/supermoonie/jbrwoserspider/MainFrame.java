@@ -31,8 +31,8 @@ public class MainFrame extends JFrame {
             setTitle(title);
         });
         getContentPane().add(tabbedPane);
-        pack();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(new Dimension(800, 600));
         setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
