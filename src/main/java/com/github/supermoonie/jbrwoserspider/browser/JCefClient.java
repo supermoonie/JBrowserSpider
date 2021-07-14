@@ -39,6 +39,29 @@ public class JCefClient {
         defaultCefClient.addDisplayHandler(new CefDisplayHandler());
         defaultCefClient.addFocusHandler(new FocusHandler());
         defaultCefClient.addLoadHandler(new BrowserLoadHandler());
+        JTabbedPane tabbedPane = App.getInstance().getMainFrame().getTabbedPane();
+        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_CALLBACK, (BiConsumer<JTabbedPane, Integer>) (tabPane, tabIndex) -> {
+            if (browserList.size() == 1) {
+                if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(App.getInstance().getMainFrame(), "确认退出？", "提示", JOptionPane.YES_NO_OPTION)) {
+                    App.getInstance().getExecutor().shutdownNow();
+                    CefApp.getInstance().dispose();
+                    System.exit(0);
+                }
+                return;
+            }
+            JCefBrowser jCefBrowser = browserList.get(tabIndex);
+            if (null != jCefBrowser.getWorkCefBrowser()) {
+                if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(App.getInstance().getMainFrame(), "确认退出？", "提示", JOptionPane.YES_NO_OPTION)) {
+                    browserList.get(tabIndex).getCefBrowser().close(true);
+                    browserList.remove(tabIndex.intValue());
+                    tabPane.removeTabAt(tabIndex);
+                }
+                return;
+            }
+            browserList.get(tabIndex).getCefBrowser().close(true);
+            browserList.remove(tabIndex.intValue());
+            tabPane.removeTabAt(tabIndex);
+        });
     }
 
     public static JCefClient getInstance() {
@@ -52,8 +75,8 @@ public class JCefClient {
         return INSTANCE;
     }
 
-    public void createBrowser(String url, boolean showControl, boolean showSpider) {
-        JCefBrowser browser = new JCefBrowser(url, showControl, showSpider);
+    public void createBrowser(String url, boolean showControl, boolean showSpider, String spiderHomeUrl) {
+        JCefBrowser browser = new JCefBrowser(url, showControl, showSpider, spiderHomeUrl);
         browserList.add(browser);
         JTabbedPane tabbedPane = App.getInstance().getMainFrame().getTabbedPane();
         if (UrlSettings.HOME.equals(url)) {
@@ -61,21 +84,6 @@ public class JCefClient {
         } else {
             tabbedPane.addTab(".", browser);
         }
-        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSABLE, true);
-        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_TOOLTIPTEXT, "Close");
-        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_CALLBACK, (BiConsumer<JTabbedPane, Integer>) (tabPane, tabIndex) -> {
-            if (browserList.size() == 1) {
-                if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(App.getInstance().getMainFrame(), "确认退出？", "提示", JOptionPane.YES_NO_OPTION)) {
-                    App.getInstance().getExecutor().shutdownNow();
-                    CefApp.getInstance().dispose();
-                    System.exit(0);
-                }
-                return;
-            }
-            browserList.get(tabIndex).getCefBrowser().close(true);
-            browserList.remove(tabIndex.intValue());
-            tabPane.removeTabAt(tabIndex);
-        });
         int lastIndex = tabbedPane.getTabCount() - 1;
         tabbedPane.setSelectedIndex(lastIndex);
     }

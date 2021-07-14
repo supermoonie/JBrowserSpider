@@ -37,7 +37,7 @@ public class App {
     @Getter
     private static App instance;
     @Getter
-    public final ScheduledExecutorService executor;
+    private final ScheduledExecutorService executor;
     @Getter
     private MainFrame mainFrame;
 
@@ -48,6 +48,7 @@ public class App {
             GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            System.exit(0);
         }
     }
 
@@ -69,7 +70,6 @@ public class App {
         } else if (SystemUtils.IS_OS_MAC) {
             JCefLoader.installAndLoadCef(settings);
         }
-        JCefClient.getInstance();
         // init executor
         executor = new ScheduledThreadPoolExecutor(
                 10,
@@ -83,7 +83,7 @@ public class App {
         SwingUtilities.invokeLater(() -> {
             // main frame
             mainFrame = new MainFrame();
-            JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false);
+            JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false, null);
             mainFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {

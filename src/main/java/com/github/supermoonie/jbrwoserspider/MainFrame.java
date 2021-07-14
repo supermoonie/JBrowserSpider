@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import javax.swing.*;
 import java.awt.*;
 
+import static com.formdev.flatlaf.FlatClientProperties.TABBED_PANE_TAB_CLOSABLE;
+import static com.formdev.flatlaf.FlatClientProperties.TABBED_PANE_TAB_CLOSE_TOOLTIPTEXT;
+
 /**
  * @author super_w
  * @since 2021/7/11
@@ -20,7 +23,9 @@ public class MainFrame extends JFrame {
     public MainFrame() throws HeadlessException {
         // 设置图标
         setIconImages(FlatSVGUtils.createWindowIconImages("/icons/JBrowserSpider.svg"));
-        tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
+        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSABLE, true);
+        tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_TOOLTIPTEXT, "Close");
         tabbedPane.addChangeListener(e -> {
             String title = tabbedPane.getToolTipTextAt(tabbedPane.getSelectedIndex());
             setTitle(title);
