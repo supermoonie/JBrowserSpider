@@ -142,7 +142,7 @@
                 </os>
             </activation>
             <properties>
-                <jdk>11</jdk>
+                <jdk>15</jdk>
             </properties>
             <dependencies>
                 <dependency>

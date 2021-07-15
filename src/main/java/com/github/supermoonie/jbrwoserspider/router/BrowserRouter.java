@@ -1,10 +1,8 @@
 package com.github.supermoonie.jbrwoserspider.router;
 
 import com.github.supermoonie.jbrwoserspider.App;
-import com.github.supermoonie.jbrwoserspider.browser.JCefClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.cef.browser.CefBrowser;
 import org.cef.browser.CefFrame;
 import org.cef.browser.CefMessageRouter;

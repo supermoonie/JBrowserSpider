@@ -6,6 +6,9 @@ import com.github.supermoonie.jbrwoserspider.handler.BrowserLoadHandler;
 import com.github.supermoonie.jbrwoserspider.handler.CefDisplayHandler;
 import com.github.supermoonie.jbrwoserspider.handler.FocusHandler;
 import com.github.supermoonie.jbrwoserspider.handler.LifeSpanHandler;
+import com.github.supermoonie.jbrwoserspider.router.FileRouter;
+import com.github.supermoonie.jbrwoserspider.router.HtmlParseHandler;
+import com.github.supermoonie.jbrwoserspider.router.VideoDownHandler;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +43,9 @@ public class JCefClient {
         defaultCefClient.addDisplayHandler(new CefDisplayHandler());
         defaultCefClient.addFocusHandler(new FocusHandler());
         defaultCefClient.addLoadHandler(new BrowserLoadHandler());
+        defaultCefClient.addMessageRouter(FileRouter.getInstance());
+        defaultCefClient.addMessageRouter(HtmlParseHandler.getInstance());
+        defaultCefClient.addMessageRouter(VideoDownHandler.getInstance());
         JTabbedPane tabbedPane = App.getInstance().getMainFrame().getTabbedPane();
         tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_CALLBACK, (BiConsumer<JTabbedPane, Integer>) (tabPane, tabIndex) -> {
             if (browserList.size() == 1) {

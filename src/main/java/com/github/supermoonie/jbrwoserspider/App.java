@@ -36,6 +36,8 @@ import java.util.logging.Logger;
 @Slf4j
 public class App {
 
+    public static final String UA = "";
+
     @Getter
     private static App instance;
     @Getter
@@ -45,12 +47,12 @@ public class App {
 
     public static void main(String[] args) {
         try {
-//            GlobalScreen.registerNativeHook();
-//            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-//            logger.setLevel(Level.OFF);
-//            logger.setUseParentHandlers(false);
+            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+            logger.setLevel(Level.OFF);
+            logger.setUseParentHandlers(false);
+            GlobalScreen.registerNativeHook();
             instance = new App();
-//            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
+            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
@@ -115,7 +117,7 @@ public class App {
         settings.log_file = debugLogPath;
         new File(debugLogPath).deleteOnExit();
         settings.persist_session_cookies = true;
-        settings.user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36";
+        settings.user_agent = UA;
         settings.background_color = settings.new ColorType(100, 255, 255, 255);
         return settings;
     }
