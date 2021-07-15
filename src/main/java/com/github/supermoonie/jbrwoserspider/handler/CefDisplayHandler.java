@@ -39,6 +39,7 @@ public class CefDisplayHandler extends CefDisplayHandlerAdapter {
         if (!browser.equals(currentBrowser.getCefBrowser())) {
             return;
         }
+        currentBrowser.setTitle(title);
         App.getInstance().getMainFrame().setTitle(title);
         tabbedPane.setTitleAt(selectedIndex, title.length() > 12 ? title.substring(0, 12) + "..." : title);
         tabbedPane.setToolTipTextAt(selectedIndex, title);

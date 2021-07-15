@@ -2,10 +2,7 @@ package com.github.supermoonie.jbrwoserspider.browser;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.github.supermoonie.jbrwoserspider.App;
-import com.github.supermoonie.jbrwoserspider.handler.BrowserLoadHandler;
-import com.github.supermoonie.jbrwoserspider.handler.CefDisplayHandler;
-import com.github.supermoonie.jbrwoserspider.handler.FocusHandler;
-import com.github.supermoonie.jbrwoserspider.handler.LifeSpanHandler;
+import com.github.supermoonie.jbrwoserspider.handler.*;
 import com.github.supermoonie.jbrwoserspider.router.FileRouter;
 import com.github.supermoonie.jbrwoserspider.router.HtmlParseHandler;
 import com.github.supermoonie.jbrwoserspider.router.VideoDownHandler;
@@ -15,6 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.cef.CefApp;
 import org.cef.CefClient;
 import org.cef.browser.CefBrowser;
+import org.cef.browser.CefFrame;
+import org.cef.handler.CefRequestHandlerAdapter;
+import org.cef.handler.CefResourceRequestHandler;
+import org.cef.misc.BoolRef;
+import org.cef.network.CefRequest;
 
 import javax.swing.*;
 import java.util.List;
@@ -44,6 +46,12 @@ public class JCefClient {
         defaultCefClient.addDisplayHandler(new CefDisplayHandler());
         defaultCefClient.addFocusHandler(new FocusHandler());
         defaultCefClient.addLoadHandler(new BrowserLoadHandler());
+        defaultCefClient.addRequestHandler(new CefRequestHandlerAdapter() {
+            @Override
+            public CefResourceRequestHandler getResourceRequestHandler(CefBrowser browser, CefFrame frame, CefRequest request, boolean isNavigation, boolean isDownload, String requestInitiator, BoolRef disableDefaultHandling) {
+                return new BrowserResourceRequestHandler();
+            }
+        });
         defaultCefClient.addMessageRouter(FileRouter.getInstance());
         defaultCefClient.addMessageRouter(HtmlParseHandler.getInstance());
         defaultCefClient.addMessageRouter(VideoDownHandler.getInstance());

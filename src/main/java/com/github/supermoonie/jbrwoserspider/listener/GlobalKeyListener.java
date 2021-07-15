@@ -20,12 +20,10 @@ public class GlobalKeyListener implements NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
         if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_F12) {
             JCefBrowser cefBrowser = JCefClient.getInstance().getCurrentBrowser();
-            cefBrowser.getDevTools().setVisible(true);
+            cefBrowser.showDevTools();
         } else if (nativeKeyEvent.getKeyCode() == NativeKeyEvent.VC_F11) {
             JCefBrowser cefBrowser = JCefClient.getInstance().getCurrentBrowser();
-            if (null != cefBrowser.getWorkDevTools()) {
-                cefBrowser.getWorkDevTools().setVisible(true);
-            }
+            cefBrowser.showWorkDevTools();
         }
     }
 

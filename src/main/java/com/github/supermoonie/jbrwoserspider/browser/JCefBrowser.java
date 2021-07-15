@@ -5,6 +5,7 @@ import com.github.supermoonie.jbrwoserspider.dialog.DevToolsDialog;
 import com.github.supermoonie.jbrwoserspider.ui.ControlPanel;
 import com.github.supermoonie.jbrwoserspider.ui.StatusPanel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.cef.browser.CefBrowser;
@@ -27,11 +28,13 @@ public class JCefBrowser extends JPanel {
     private CefBrowser workCefBrowser;
     private ControlPanel controlPanel;
     private final StatusPanel statusPanel;
-    private final DevToolsDialog devTools;
+    private DevToolsDialog devTools;
     private DevToolsDialog workDevTools;
     private JPanel browserPanel;
     private JPanel workBrowserPanel;
     private JSplitPane splitPane;
+    @Setter
+    private String title;
 
     public JCefBrowser(String currentUrl, boolean showControl, boolean showSpider, String spiderHomeUrl) {
         this.currentUrl = currentUrl;
@@ -54,7 +57,6 @@ public class JCefBrowser extends JPanel {
             splitPane.setTopComponent(browserPanel);
             workBrowserPanel = new JPanel(new BorderLayout());
             this.workCefBrowser = JCefClient.getInstance().getDefaultCefClient().createBrowser(spiderHomeUrl, false, false);
-            this.workDevTools = new DevToolsDialog(App.getInstance().getMainFrame(), "DEV Tools", workCefBrowser);
             workBrowserPanel.add(this.workCefBrowser.getUIComponent(), BorderLayout.CENTER);
             splitPane.setBottomComponent(workBrowserPanel);
             add(splitPane, BorderLayout.CENTER);
@@ -67,7 +69,7 @@ public class JCefBrowser extends JPanel {
             statusPanel = new StatusPanel();
             add(this.statusPanel, BorderLayout.SOUTH);
         }
-        devTools = new DevToolsDialog(App.getInstance().getMainFrame(), "DEV Tools", cefBrowser);
+
         setEnabled(true);
         setVisible(true);
         SwingUtilities.invokeLater(() -> {
@@ -75,6 +77,18 @@ public class JCefBrowser extends JPanel {
                 splitPane.setDividerLocation(0.6);
             }
         });
+    }
+
+    public void showDevTools() {
+        devTools = new DevToolsDialog(App.getInstance().getMainFrame(), "DEV Tools", cefBrowser);
+        devTools.setVisible(true);
+    }
+
+    public void showWorkDevTools() {
+        if (null != workCefBrowser) {
+            this.workDevTools = new DevToolsDialog(App.getInstance().getMainFrame(), "DEV Tools", workCefBrowser);
+            this.workDevTools.setVisible(true);
+        }
     }
 
 }

@@ -13,7 +13,8 @@ public interface UrlSettings {
 
     String HOME = PropertiesUtil.getHost() + "/home_index.html";
 
-    Map<String, String> HOST_HOME_MAP = new HashMap<String, String>() {{
+    Map<String, String> HOST_HOME_MAP = new HashMap<>() {{
         put("www.bilibili.com", PropertiesUtil.getHost() + "/bilibili_index.html");
+        put("www.douyin.com", PropertiesUtil.getHost() + "/douyin_index.html");
     }};
 }
