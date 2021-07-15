@@ -91,27 +91,27 @@ public class App {
                             log.error(error, throwable);
                         }).build(), (r, executor) -> log.warn("Thread: {} reject by {}", r.toString(), executor.toString()));
         log.info("executor init");
+        CefApp.getInstance().createClient();
         SwingUtilities.invokeLater(() -> {
             // main frame
             mainFrame = new MainFrame();
             log.info("main frame init");
-            JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false, null);
-            log.info("CefClient init");
             mainFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
-//                    CefApp.getInstance().dispose();
                     mainFrame.dispose();
                     System.exit(0);
                 }
             });
+            JCefClient.getInstance().createBrowser(UrlSettings.HOME, false, false, null);
+            log.info("CefClient init");
         });
     }
 
     private CefSettings cefSettings() {
         File cefPath = Folders.crateTempFolder(".cef");
         CefSettings settings = new CefSettings();
-        settings.windowless_rendering_enabled = false;
+//        settings.windowless_rendering_enabled = false;
         settings.cache_path = cefPath.getAbsolutePath();
         String debugLogPath = cefPath.getAbsolutePath() + File.separator + "debug.log";
         settings.log_file = debugLogPath;

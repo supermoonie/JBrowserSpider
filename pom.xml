@@ -13,8 +13,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>${jdk}</maven.compiler.source>
-        <maven.compiler.target>${jdk}</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -142,7 +140,8 @@
                 </os>
             </activation>
             <properties>
-                <jdk>15</jdk>
+                <maven.compiler.source>15</maven.compiler.source>
+                <maven.compiler.target>15</maven.compiler.target>
             </properties>
             <dependencies>
                 <dependency>
@@ -218,7 +217,8 @@
                 </os>
             </activation>
             <properties>
-                <jdk>1.8</jdk>
+                <maven.compiler.source>1.8</maven.compiler.source>
+                <maven.compiler.target>1.8</maven.compiler.target>
             </properties>
             <dependencies>
                 <dependency>

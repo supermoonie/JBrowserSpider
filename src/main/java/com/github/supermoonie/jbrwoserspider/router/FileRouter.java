@@ -101,7 +101,7 @@ public class FileRouter extends CefMessageRouterHandlerAdapter {
         }
         SwingUtilities.invokeLater(() -> {
             try {
-                List<FileMoveRequest> moveRequestList = JSONObject.parseObject(req, new TypeReference<>() {
+                List<FileMoveRequest> moveRequestList = JSONObject.parseObject(req, new TypeReference<List<FileMoveRequest>>() {
                 });
                 List<String> targetList = new ArrayList<>();
                 for (FileMoveRequest moveRequest : moveRequestList) {
@@ -205,11 +205,14 @@ public class FileRouter extends CefMessageRouterHandlerAdapter {
                 }
                 callback.success(JSON.toJSONString(responseList));
             };
-            CefDialogHandler.FileDialogMode mode = switch (fileSelectRequest.getSelectType()) {
-                case 1 -> CefDialogHandler.FileDialogMode.FILE_DIALOG_OPEN_MULTIPLE;
-                case 2 -> CefDialogHandler.FileDialogMode.FILE_DIALOG_SAVE;
-                default -> CefDialogHandler.FileDialogMode.FILE_DIALOG_OPEN;
-            };
+            CefDialogHandler.FileDialogMode mode;
+            if (1 == fileSelectRequest.getSelectType()) {
+                mode = CefDialogHandler.FileDialogMode.FILE_DIALOG_OPEN_MULTIPLE;
+            } else if (2 == fileSelectRequest.getSelectType()) {
+                mode = CefDialogHandler.FileDialogMode.FILE_DIALOG_SAVE;
+            } else {
+                mode = CefDialogHandler.FileDialogMode.FILE_DIALOG_OPEN;
+            }
             Vector<String> acceptFilters = null;
             if (null != fileSelectRequest.getExtensionFilter() && !fileSelectRequest.getExtensionFilter().isEmpty()) {
                 acceptFilters = new Vector<>(fileSelectRequest.getExtensionFilter());

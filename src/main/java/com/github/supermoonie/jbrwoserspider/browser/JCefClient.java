@@ -37,6 +37,7 @@ public class JCefClient {
     private final List<JCefBrowser> browserList = new Vector<>();
 
     private JCefClient() {
+        log.info("defaultCefClient before created");
         defaultCefClient = CefApp.getInstance().createClient();
         log.info("defaultCefClient created");
         defaultCefClient.addLifeSpanHandler(new LifeSpanHandler());
