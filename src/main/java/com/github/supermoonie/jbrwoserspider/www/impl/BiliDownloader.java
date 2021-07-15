@@ -102,8 +102,8 @@ public class BiliDownloader implements Downloader {
             FileUtils.moveFile(tempTargetFile, targetFile);
         } finally {
             ffmpeg.destroy();
-//            tempAudioFile.delete();
-//            tempVideoFile.delete();
+            tempAudioFile.delete();
+            tempVideoFile.delete();
         }
         return null;
     }
