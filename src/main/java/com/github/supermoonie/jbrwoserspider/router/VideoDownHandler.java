@@ -31,9 +31,7 @@ import ws.schild.jave.process.ProcessWrapper;
 import ws.schild.jave.process.ffmpeg.DefaultFFMPEGLocator;
 import ws.schild.jave.utils.RBufferedReader;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +86,7 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
         }
     }
 
+    // https://pro.coolcollege.cn/?eid=1372001210185420819#/course/watch?courseId=1791325853397946368&exitAiUpdate=false&resourceId=1791319240620511232&source=enterprise&storage_type=PUBLIC_CLOUD&videoId=9d6dbe1392b7499690d9fea986e7e1fe
     private void onVideoCustomDownload(CefBrowser browser, String request, CefQueryCallback callback) {
         App.getInstance().getExecutor().execute(() -> {
             try {
@@ -98,16 +97,39 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                 RequestBuilder requestBuilder = RequestBuilder.get(downloadReq.getUrl());
                 Map<String, String> headers = JSON.parseObject(downloadReq.getHeaders(), new TypeReference<>() {
                 });
-                for (String key : headers.keySet()) {
-                    requestBuilder.addHeader(key, headers.get(key));
-                }
+                requestBuilder.setHeader("User-Agent", App.UA);
                 File targetFolder = new File(downloadReq.getPath());
                 File targetFile = new File(downloadReq.getPath() + File.separator + downloadReq.getName() + ".mp4");
                 if (downloadReq.getContentType().equals("video/mp4")) {
                     httpClient.execute(requestBuilder.build(), (ResponseHandler<Void>) response -> {
-                        byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-                        FileUtils.writeByteArrayToFile(targetFile, bytes);
+                        HttpEntity entity = response.getEntity();
+                        long contentLength = entity.getContentLength();
+                        InputStream is = entity.getContent();
+                        byte[] buf = new byte[1024];
+                        long readSize = 0;
+                        int size;
+                        FileOutputStream fos = new FileOutputStream(targetFile);
+                        List<Long> send = new ArrayList<>();
+                        while ((size = is.read(buf)) != -1) {
+                            fos.write(buf, 0, size);
+                            readSize = readSize + size;
+                            long progress = (readSize * 100L) / contentLength;
+                            if (send.contains(progress)) {
+                                continue;
+                            }
+                            send.add(progress);
+                            log.info("{} : {}", downloadReq.getName(), progress);
+                            if (progress % 10 == 0) {
+                                browser.executeJavaScript(String.format("window._COMMON.setDownloadProgress('%s', %d)", downloadReq.getVideoId(), progress), "", 0);
+                            }
+                        }
+                        browser.executeJavaScript(String.format("window._COMMON.setDownloadProgress('%s', %d)", downloadReq.getVideoId(), 100), "", 0);
+                        fos.flush();
+                        fos.close();
                         return null;
+//                        byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+//                        FileUtils.writeByteArrayToFile(targetFile, bytes);
+//                        return null;
                     });
                 } else {
                     Playlist playlist = httpClient.execute(requestBuilder.build(), response -> {

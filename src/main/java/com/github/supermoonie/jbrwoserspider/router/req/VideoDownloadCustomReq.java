@@ -9,6 +9,8 @@ import lombok.Data;
 @Data
 public class VideoDownloadCustomReq {
 
+    private String videoId;
+
     private String url;
 
     private String path;

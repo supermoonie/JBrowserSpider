@@ -15,6 +15,7 @@ public interface UrlSettings {
 
     Map<String, String> HOST_HOME_MAP = new HashMap<>() {{
         put("www.bilibili.com", PropertiesUtil.getHost() + "/bilibili_index.html");
-        put("www.douyin.com", PropertiesUtil.getHost() + "/douyin_index.html");
+        put("www.douyin.com", PropertiesUtil.getHost() + "/common_video_index.html");
+        put("www.coolcollege.cn", PropertiesUtil.getHost() + "/common_video_index.html");
     }};
 }
