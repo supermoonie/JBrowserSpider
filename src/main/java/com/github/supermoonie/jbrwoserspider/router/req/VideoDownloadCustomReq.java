@@ -15,5 +15,7 @@ public class VideoDownloadCustomReq {
 
     private String name;
 
+    private String contentType;
+
     private String headers;
 }
