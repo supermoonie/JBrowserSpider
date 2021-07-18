@@ -25,6 +25,11 @@ public class BrowserResourceRequestHandler extends CefResourceRequestHandlerAdap
     private static final List<String> VIDEO_TYPES = List.of("application/vnd.apple.mpegurl", "video/mp4");
 
     @Override
+    public boolean onBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request) {
+        return super.onBeforeResourceLoad(browser, frame, request);
+    }
+
+    @Override
     public void onResourceLoadComplete(CefBrowser browser, CefFrame frame, CefRequest request, CefResponse response, CefURLRequest.Status status, long receivedContentLength) {
         String contentType = response.getMimeType();
         final String url = request.getURL();

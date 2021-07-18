@@ -4,8 +4,9 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.github.supermoonie.jbrwoserspider.App;
 import com.github.supermoonie.jbrwoserspider.handler.*;
 import com.github.supermoonie.jbrwoserspider.router.FileRouter;
-import com.github.supermoonie.jbrwoserspider.router.HtmlParseHandler;
-import com.github.supermoonie.jbrwoserspider.router.VideoDownHandler;
+import com.github.supermoonie.jbrwoserspider.router.HtmlParseRouter;
+import com.github.supermoonie.jbrwoserspider.router.PreferencesRouter;
+import com.github.supermoonie.jbrwoserspider.router.VideoDownRouter;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -53,8 +54,9 @@ public class JCefClient {
             }
         });
         defaultCefClient.addMessageRouter(FileRouter.getInstance());
-        defaultCefClient.addMessageRouter(HtmlParseHandler.getInstance());
-        defaultCefClient.addMessageRouter(VideoDownHandler.getInstance());
+        defaultCefClient.addMessageRouter(HtmlParseRouter.getInstance());
+        defaultCefClient.addMessageRouter(VideoDownRouter.getInstance());
+        defaultCefClient.addMessageRouter(PreferencesRouter.getInstance());
         JTabbedPane tabbedPane = App.getInstance().getMainFrame().getTabbedPane();
         tabbedPane.putClientProperty(TABBED_PANE_TAB_CLOSE_CALLBACK, (BiConsumer<JTabbedPane, Integer>) (tabPane, tabIndex) -> {
             if (browserList.size() == 1) {
@@ -71,12 +73,14 @@ public class JCefClient {
                     browserList.get(tabIndex).getCefBrowser().close(true);
                     browserList.remove(tabIndex.intValue());
                     tabPane.removeTabAt(tabIndex);
+                    System.gc();
                 }
                 return;
             }
             browserList.get(tabIndex).getCefBrowser().close(true);
             browserList.remove(tabIndex.intValue());
             tabPane.removeTabAt(tabIndex);
+            System.gc();
         });
     }
 

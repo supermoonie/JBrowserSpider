@@ -17,6 +17,7 @@ import com.iheartradio.m3u8.data.Playlist;
 import com.iheartradio.m3u8.data.TrackData;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.fluent.Request;
@@ -44,14 +45,14 @@ import java.util.stream.Collectors;
  * @since 2021/6/27
  */
 @Slf4j
-public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
+public class VideoDownRouter extends CefMessageRouterHandlerAdapter {
 
     private static final String VIDEO_DOWNLOAD = "video:download:";
     private static final String VIDEO_DOWNLOAD_CUSTOM = "video:download:custom:";
 
     private static CefMessageRouter videoDownHandler;
 
-    private VideoDownHandler() {
+    private VideoDownRouter() {
 
     }
 
@@ -60,7 +61,7 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
             synchronized (BrowserRouter.class) {
                 if (null == videoDownHandler) {
                     videoDownHandler = CefMessageRouter.create(new CefMessageRouter.CefMessageRouterConfig("videoDownloadQuery", "cancelVideoDownloadQuery"));
-                    videoDownHandler.addHandler(new VideoDownHandler(), true);
+                    videoDownHandler.addHandler(new VideoDownRouter(), true);
                 }
             }
         }
@@ -98,6 +99,11 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                 Map<String, String> headers = JSON.parseObject(downloadReq.getHeaders(), new TypeReference<>() {
                 });
                 requestBuilder.setHeader("User-Agent", App.UA);
+                String referer = StringUtils.isEmpty(headers.get("Referer")) ? headers.get("referer") : null;
+                if (StringUtils.isNotEmpty(referer)) {
+                    log.info("referer: {}", referer);
+                    requestBuilder.setHeader("Referer", referer);
+                }
                 File targetFolder = new File(downloadReq.getPath());
                 File targetFile = new File(downloadReq.getPath() + File.separator + downloadReq.getName() + ".mp4");
                 if (downloadReq.getContentType().equals("video/mp4")) {
@@ -119,7 +125,7 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                             }
                             send.add(progress);
                             log.info("{} : {}", downloadReq.getName(), progress);
-                            if (progress % 10 == 0) {
+                            if (progress % 2 == 0) {
                                 browser.executeJavaScript(String.format("window._COMMON.setDownloadProgress('%s', %d)", downloadReq.getVideoId(), progress), "", 0);
                             }
                         }
@@ -127,9 +133,6 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                         fos.flush();
                         fos.close();
                         return null;
-//                        byte[] bytes = EntityUtils.toByteArray(response.getEntity());
-//                        FileUtils.writeByteArrayToFile(targetFile, bytes);
-//                        return null;
                     });
                 } else {
                     Playlist playlist = httpClient.execute(requestBuilder.build(), response -> {
@@ -152,6 +155,8 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                     int size = tracks.size();
                     String randomId = UUID.randomUUID().toString().replaceAll("-", "");
                     List<File> fileList = new ArrayList<>();
+                    List<Long> send = new ArrayList<>();
+                    AtomicInteger sendIndex = new AtomicInteger(0);
                     tracks.forEach(track -> {
                         try {
                             File video = Request.Get(track.getUri()).userAgent(App.UA)
@@ -162,6 +167,15 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                                         FileUtils.writeByteArrayToFile(ts, bytes);
                                         return ts;
                                     });
+                            long progress = (sendIndex.incrementAndGet() * 100L) / size;
+                            if (!send.contains(progress)) {
+                                send.add(progress);
+                                log.info("{} : {}", downloadReq.getName(), progress);
+                                if (progress % 2 == 0) {
+                                    browser.executeJavaScript(String.format("window._COMMON.setDownloadProgress('%s', %d)", downloadReq.getVideoId(), progress), "", 0);
+                                }
+                            }
+
                             fileList.add(video);
                         } catch (IOException e) {
                            log.error(e.getMessage(), e);
@@ -197,6 +211,7 @@ public class VideoDownHandler extends CefMessageRouterHandlerAdapter {
                         } finally {
                             ffmpeg.destroy();
                         }
+                        browser.executeJavaScript(String.format("window._COMMON.setDownloadProgress('%s', %d)", downloadReq.getVideoId(), 100), "", 0);
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }

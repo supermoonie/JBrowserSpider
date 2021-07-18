@@ -8,6 +8,7 @@ import com.github.supermoonie.jbrwoserspider.listener.GlobalKeyListener;
 import com.github.supermoonie.jbrwoserspider.loader.CefLoader;
 import com.github.supermoonie.jbrwoserspider.setting.UrlSettings;
 import com.github.supermoonie.jbrwoserspider.util.Folders;
+import com.github.supermoonie.jbrwoserspider.util.PropertiesUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
@@ -47,12 +48,16 @@ public class App {
 
     public static void main(String[] args) {
         try {
-            Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-            logger.setLevel(Level.OFF);
-            logger.setUseParentHandlers(false);
-            GlobalScreen.registerNativeHook();
+            if (!PropertiesUtil.isRelease()) {
+                Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+                logger.setLevel(Level.OFF);
+                logger.setUseParentHandlers(false);
+                GlobalScreen.registerNativeHook();
+            }
             instance = new App();
-            GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
+            if (!PropertiesUtil.isRelease()) {
+                GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
+            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             System.exit(0);
@@ -92,6 +97,7 @@ public class App {
                         }).build(), (r, executor) -> log.warn("Thread: {} reject by {}", r.toString(), executor.toString()));
         log.info("executor init");
         SwingUtilities.invokeLater(() -> {
+            AppPreferences.init();
             // main frame
             mainFrame = new MainFrame();
             log.info("main frame init");

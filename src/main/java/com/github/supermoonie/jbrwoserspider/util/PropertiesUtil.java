@@ -27,6 +27,17 @@ public class PropertiesUtil {
     }
 
     public static String getHost() {
-        return PROPERTIES.getProperty("host");
+        String host = PROPERTIES.getProperty("host");
+        log.info("host: {}", host);
+        return host;
+    }
+
+    public static boolean isRelease() {
+        try {
+            return Boolean.parseBoolean(PROPERTIES.getProperty("release"));
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 }

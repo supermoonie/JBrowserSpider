@@ -21,13 +21,13 @@ import org.cef.handler.CefMessageRouterHandlerAdapter;
  * @since 2021/6/26
  */
 @Slf4j
-public class HtmlParseHandler extends CefMessageRouterHandlerAdapter {
+public class HtmlParseRouter extends CefMessageRouterHandlerAdapter {
 
     private static final String HTML_PARSE = "html:parse:";
 
     private static CefMessageRouter htmlParseHandler;
 
-    private HtmlParseHandler() {
+    private HtmlParseRouter() {
 
     }
 
@@ -36,7 +36,7 @@ public class HtmlParseHandler extends CefMessageRouterHandlerAdapter {
             synchronized (BrowserRouter.class) {
                 if (null == htmlParseHandler) {
                     htmlParseHandler = CefMessageRouter.create(new CefMessageRouter.CefMessageRouterConfig("htmlParseQuery", "cancelHtmlParseQuery"));
-                    htmlParseHandler.addHandler(new HtmlParseHandler(), true);
+                    htmlParseHandler.addHandler(new HtmlParseRouter(), true);
                 }
             }
         }
