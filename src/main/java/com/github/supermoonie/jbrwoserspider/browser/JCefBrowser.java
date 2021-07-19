@@ -74,7 +74,7 @@ public class JCefBrowser extends JPanel {
         setVisible(true);
         SwingUtilities.invokeLater(() -> {
             if (null != splitPane) {
-                splitPane.setDividerLocation(0.6);
+                splitPane.setDividerLocation(0.8);
             }
         });
     }

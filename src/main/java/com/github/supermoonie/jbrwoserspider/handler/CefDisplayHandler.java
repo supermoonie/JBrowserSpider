@@ -21,11 +21,11 @@ public class CefDisplayHandler extends CefDisplayHandlerAdapter {
         if (url.contains("devtools") || url.equals(UrlSettings.HOME)) {
             return;
         }
-        JCefBrowser currentBrowser = JCefClient.getInstance().getCurrentBrowser();
-        if (!browser.equals(currentBrowser.getCefBrowser())) {
+        JCefBrowser jCefBrowser = JCefClient.getInstance().getBrowser(browser);
+        if (null == jCefBrowser) {
             return;
         }
-        currentBrowser.getControlPanel().setAddress(currentBrowser.getCefBrowser(), url);
+        jCefBrowser.getControlPanel().setAddress(jCefBrowser.getCefBrowser(), url);
     }
 
     @Override
@@ -35,11 +35,11 @@ public class CefDisplayHandler extends CefDisplayHandlerAdapter {
         }
         JTabbedPane tabbedPane = App.getInstance().getMainFrame().getTabbedPane();
         int selectedIndex = tabbedPane.getSelectedIndex();
-        JCefBrowser currentBrowser = JCefClient.getInstance().getCurrentBrowser();
-        if (!browser.equals(currentBrowser.getCefBrowser())) {
+        JCefBrowser jCefBrowser = JCefClient.getInstance().getBrowser(browser);
+        if (null == jCefBrowser) {
             return;
         }
-        currentBrowser.setTitle(title);
+        jCefBrowser.setTitle(title);
         App.getInstance().getMainFrame().setTitle(title);
         tabbedPane.setTitleAt(selectedIndex, title.length() > 12 ? title.substring(0, 12) + "..." : title);
         tabbedPane.setToolTipTextAt(selectedIndex, title);
