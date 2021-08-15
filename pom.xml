@@ -121,7 +121,7 @@
         <profile>
             <id>debug</id>
             <properties>
-                <host>http://localhost:3050</host>
+                <host>https://client</host>
                 <release>false</release>
             </properties>
         </profile>
